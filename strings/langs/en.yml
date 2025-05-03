@@ -83,7 +83,7 @@ admin_39 : "» ʀᴇᴍᴏᴠᴇᴅ 1 ᴜᴘᴠᴏᴛᴇ."
 admin_40 : "ᴜᴘᴠᴏᴛᴇᴅ."
 
 start_1 : "{0} ɪs ᴀʟɪᴠᴇ ʙᴀʙʏ.\n\n<b>✫ ᴜᴘᴛɪᴍᴇ :</b> {1}"
-start_2 : "<blockquote>❖ {0} </blockquote>\n <blockquote>𝖣𝖺𝗍𝖺 𝖢𝗈𝗋𝖾 𝖲𝗒𝗌𝗍𝖾𝗆𝗌:\n• Curated by Apple Music Editors\n• Powered by Siri Intelligence\n• Seamless Integration Across\nApple Devices\n• High-Fidelity Audio with\nSpatial Sound</blockquote>\n\n<blockquote>▶︎ •၊၊||၊|။||||။‌‌‌‌‌၊|• 0:10</blockquote>"
+start_2 : "<blockquote>❖ {0} </blockquote>\n <blockquote><b>𝖣𝖺𝗍𝖺 𝖢𝗈𝗋𝖾 𝖲𝗒𝗌𝗍𝖾𝗆𝗌:</b>\n• Curated by Apple Music Editors\n• Powered by Siri Intelligence\n• Seamless Integration Across\nApple Devices\n• High-Fidelity Audio with\nSpatial Sound</blockquote>"
 start_3 : "ʜᴇʏ {0},\nᴛʜɪs ɪs {1}\n\nᴛʜᴀɴᴋs ғᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ ɪɴ {2}, {3} ᴄᴀɴ ɴᴏᴡ ᴩʟᴀʏ sᴏɴɢs ɪɴ ᴛʜɪs ᴄʜᴀᴛ."
 start_3 : "ʜᴇʏ {0},\nᴛʜɪs ɪs {1}\n\nᴛʜᴀɴᴋs ғᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ ɪɴ {2}, {3} ᴄᴀɴ ɴᴏᴡ ᴩʟᴀʏ sᴏɴɢs ɪɴ ᴛʜɪs ᴄʜᴀᴛ."
 start_4 : "✧  <b>sᴜᴘᴇʀɢʀᴏᴜᴘ ɴᴇᴇᴅᴇᴅ</b> ✧ \n\nᴘʟᴇᴀsᴇ ᴄᴏɴᴠᴇʀᴛ ʏᴏᴜʀ <b>ɢʀᴏᴜᴘ</b> ᴛᴏ <b>sᴜᴘᴇʀɢʀᴏᴜᴘ</b> ᴀɴᴅ ᴛʜᴇɴ ᴀᴅᴅ ᴍᴇ ᴀɢᴀɪɴ.\n\n<b>ʜᴏᴡ ᴛᴏ ᴍᴀᴋᴇ sᴜᴘᴇʀɢʀᴏᴜᴘ ?</b>\n- ᴍᴀᴋᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ's ᴄʜᴀᴛ ʜɪsᴛᴏʀʏ <b>ᴠɪsɪʙʟᴇ</b> ᴏɴᴄᴇ."
@@ -173,7 +173,7 @@ queue_6 : "<b>🕚 ᴅᴜʀᴀᴛɪᴏɴ :</b> ᴜɴᴋɴᴏᴡɴ ᴅᴜʀᴀᴛ
 queue_7 : "\nᴄʟɪᴄᴋ ᴏɴ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴡʜᴏʟᴇ ǫᴜᴇᴜᴇᴅ ʟɪsᴛ."
 queue_8 : "<b>{0} ᴘʟᴀʏᴇʀ</b>\n\n✧ <b>sᴛʀᴇᴀᴍɪɴɢ :</b> {1}\n\n🔗 <b>sᴛʀᴇᴀᴍ ᴛʏᴘᴇ :</b> {2}\n✧ <b>ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :</b> {3}\n{4}"
 
-stream_1 : "<b><blockquote> 𝐒ᴛʀєᴧϻɪηɢ </blockquote></b>\n\n<b><blockquote>━━━━━━━━━━━━━━━━━━━━━━━━\n ▣ 𝖳𝗂𝗍𝗅𝖾 ➥</b> <a href={0}>{1}</a> \n<b>▣ 𝖣𝗎𝗋𝖺𝗍𝗂𝗈𝗇</b> {2} ϻɪηυᴛєs \n<b>▣ 𝖱𝖾𝗊𝗎𝖾𝗌𝗍𝖾𝖽 𝖡𝗒</b> {3}<b></blockquote>"
+stream_1 : "<b><blockquote> 𝐒ᴛʀєᴧϻɪηɢ </blockquote></b>\n\n<b><blockquote>━━━━━━━━━━━━━━━━━━━━━━━━\n ▣ 𝖳𝗂𝗍𝗅𝖾 ➥</b> <a href={0}>{1}</a> \n<b>▣ 𝖣𝗎𝗋𝖺𝗍𝗂𝗈𝗇</b> {2} ϻɪηυᴛєs \n<b>▣ 𝖱𝖾𝗊𝗎𝖾𝗌𝗍𝖾𝖽 𝖡𝗒</b> {3}\n━━━━━━━━━━━━━━━━━━━━━━━━<b></blockquote>"
 stream_2 : "<b><blockquote>➥ 𝐏ʟʏɪиɢ 𝐎η 𝐒ᴛʀєᴧϻɪηɢ  ⏤͟͞●</blockquote></b>\n\n<b><blockquote>❍ sᴛʀєᴧϻ ᴛʏᴘє ➥</b> ʟɪᴠєsᴛʀєᴧϻ [ υʀʟ ]\n<b>❍ ʙʏ ➥</b> {0}</blockquote>"
 
 CLOSE_BUTTON  : "ᴄʟᴏsᴇ"
