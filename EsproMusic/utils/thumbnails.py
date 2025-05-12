@@ -1,136 +1,151 @@
-import os
-import re
-import random
+import asyncio
+from io import BytesIO
 
-import aiofiles
-import aiohttp
+import httpx
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+from aiofiles.os import path as aiopath
 
-from PIL import Image, ImageDraw, ImageEnhance
-from PIL import ImageFilter, ImageFont, ImageOps
+from EsproMusic.helpers import CachedTrack  # Adjust this import if needed
+from EsproMusic import LOGGER  # Adjust if LOGGER is in a different place
 
-from unidecode import unidecode
-from youtubesearchpython.__future__ import VideosSearch
-
-from EsproMusic import app
-from config import YOUTUBE_IMG_URL
-
-
-def changeImageSize(maxWidth, maxHeight, image):
-    widthRatio = maxWidth / image.size[0]
-    heightRatio = maxHeight / image.size[1]
-    newWidth = int(widthRatio * image.size[0])
-    newHeight = int(heightRatio * image.size[1])
-    newImage = image.resize((newWidth, newHeight))
-    return newImage
+FONTS = {
+    "cfont": ImageFont.truetype("EsproMusic/assets/cfont.ttf", 15),
+    "dfont": ImageFont.truetype("EsproMusic/assets/font2.otf", 12),
+    "nfont": ImageFont.truetype("EsproMusic/assets/font.ttf", 10),
+    "tfont": ImageFont.truetype("EsproMusic/assets/font.ttf", 20),
+}
 
 
-def clear(text):
-    list = text.split(" ")
-    title = ""
-    for i in list:
-        if len(title) + len(i) < 60:
-            title += " " + i
-    return title.strip()
+def resize_youtube_thumbnail(img: Image.Image) -> Image.Image:
+    target_size = 640
+    aspect_ratio = img.width / img.height
+
+    if aspect_ratio > 1:
+        new_width = int(target_size * aspect_ratio)
+        new_height = target_size
+    else:
+        new_width = target_size
+        new_height = int(target_size / aspect_ratio)
+
+    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+    left = (img.width - target_size) // 2
+    top = (img.height - target_size) // 2
+    right = left + target_size
+    bottom = top + target_size
+
+    return img.crop((left, top, right, bottom))
 
 
-async def get_thumb(videoid):
-    if os.path.isfile(f"cache/{videoid}.png"):
-        return f"cache/{videoid}.png"
-
-    url = f"https://www.youtube.com/watch?v={videoid}"
-    try:
-        results = VideosSearch(url, limit=1)
-        for result in (await results.next())["result"]:
-            try:
-                title = result["title"]
-                title = re.sub("\W+", " ", title)
-                title = title.title()
-            except:
-                title = "Unsupported Title"
-            try:
-                duration = result["duration"]
-            except:
-                duration = "Unknown Mins"
-            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-            try:
-                views = result["viewCount"]["short"]
-            except:
-                views = "Unknown Views"
-            try:
-                channel = result["channel"]["name"]
-            except:
-                channel = "Unknown Channel"
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(thumbnail) as resp:
-                if resp.status == 200:
-                    f = await aiofiles.open(f"cache/thumb{videoid}.png", mode="wb")
-                    await f.write(await resp.read())
-                    await f.close()
+def resize_jiosaavn_thumbnail(img: Image.Image) -> Image.Image:
+    target_size = 600
+    img = img.resize((target_size, target_size), Image.Resampling.LANCZOS)
+    return img
 
 
-        colors = ["white", "red", "orange", "yellow", "green", "cyan", "azure", "blue", "violet", "magenta", "pink"]
-        border = random.choice(colors)
-        youtube = Image.open(f"cache/thumb{videoid}.png")
-        image1 = changeImageSize(1280, 720, youtube)
-        bg_bright = ImageEnhance.Brightness(image1)
-        bg_logo = bg_bright.enhance(1.1)
-        bg_contra = ImageEnhance.Contrast(bg_logo)
-        bg_logo = bg_contra.enhance(1.1)
-        logox = ImageOps.expand(bg_logo, border=7, fill=f"{border}")
-        background = changeImageSize(1280, 720, logox)
-        # image2 = image1.convert("RGBA")
-        # background = image2.filter(filter=ImageFilter.BoxBlur(1))
-        #enhancer = ImageEnhance.Brightness(background)
-        #background = enhancer.enhance(0.9)
-        #draw = ImageDraw.Draw(background)
-        #arial = ImageFont.truetype("EsproMusic/assets/font2.ttf", 30)
-        #font = ImageFont.truetype("EsproMusic/assets/font.ttf", 30)
-        # draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
-        """
-        draw.text(
-            (1, 1),
-            f"{channel} | {views[:23]}",
-            (1, 1, 1),
-            font=arial,
-        )
-        draw.text(
-            (1, 1),
-            clear(title),
-            (1, 1, 1),
-            font=font,
-        )
-        draw.line(
-            [(1, 1), (1, 1)],
-            fill="white",
-            width=1,
-            joint="curve",
-        )
-        draw.ellipse(
-            [(1, 1), (2, 1)],
-            outline="white",
-            fill="white",
-            width=1,
-        )
-        draw.text(
-            (1, 1),
-            "00:00",
-            (1, 1, 1),
-            font=arial,
-        )
-        draw.text(
-            (1, 1),
-            f"{duration[:23]}",
-            (1, 1, 1),
-            font=arial,
-        )
-        """
+async def fetch_image(url: str) -> Image.Image | None:
+    if not url:
+        return None
+
+    async with httpx.AsyncClient() as client:
         try:
-            os.remove(f"cache/thumb{videoid}.png")
-        except:
-            pass
-        background.save(f"cache/{videoid}.png")
-        return f"cache/{videoid}.png"
+            if url.startswith("https://is1-ssl.mzstatic.com"):
+                url = url.replace("500x500bb.jpg", "600x600bb.jpg")
+            response = await client.get(url, timeout=5)
+            response.raise_for_status()
+            img = Image.open(BytesIO(response.content)).convert("RGBA")
+            if url.startswith("https://i.ytimg.com"):
+                img = resize_youtube_thumbnail(img)
+            elif url.startswith("http://c.saavncdn.com") or url.startswith(
+                "https://i1.sndcdn"
+            ):
+                img = resize_jiosaavn_thumbnail(img)
+            return img
+        except Exception as e:
+            LOGGER.error("Image loading error: %s", e)
+            return None
+
+
+def clean_text(text: str, limit: int = 17) -> str:
+    text = text.strip()
+    return f"{text[:limit - 3]}..." if len(text) > limit else text
+
+
+def add_controls(img: Image.Image) -> Image.Image:
+    img = img.filter(ImageFilter.GaussianBlur(25))
+    box = (120, 120, 520, 480)
+
+    region = img.crop(box)
+    controls = Image.open("EsproMusic/assets/controls.png").convert("RGBA")
+    dark_region = ImageEnhance.Brightness(region).enhance(0.5)
+
+    mask = Image.new("L", dark_region.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle(
+        (0, 0, box[2] - box[0], box[3] - box[1]), 40, fill=255
+    )
+
+    img.paste(dark_region, box, mask)
+    img.paste(controls, (135, 305), controls)
+
+    return img
+
+
+def make_sq(image: Image.Image, size: int = 125) -> Image.Image:
+    width, height = image.size
+    side_length = min(width, height)
+    crop = image.crop(
+        (
+            (width - side_length) // 2,
+            (height - side_length) // 2,
+            (width + side_length) // 2,
+            (height + side_length) // 2,
+        )
+    )
+    resize = crop.resize((size, size), Image.Resampling.LANCZOS)
+
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, size, size), radius=30, fill=255)
+
+    rounded = ImageOps.fit(resize, (size, size))
+    rounded.putalpha(mask)
+    return rounded
+
+
+def get_duration(duration: int, time: str = "0:24") -> str:
+    try:
+        m1, s1 = divmod(duration, 60)
+        m2, s2 = map(int, time.split(":"))
+        sec = (m1 * 60 + s1) - (m2 * 60 + s2)
+        _min, sec = divmod(sec, 60)
+        return f"{_min}:{sec:02d}"
     except Exception as e:
-        print(e)
-        return YOUTUBE_IMG_URL
+        LOGGER.error("Duration calculation error: %s", e)
+        return "0:00"
+
+
+async def gen_thumb(song: CachedTrack) -> str:
+    save_dir = f"database/photos/{song.track_id}.png"
+    if await aiopath.exists(save_dir):
+        return save_dir
+
+    title, artist = clean_text(song.name), clean_text(song.artist or "Spotify")
+    duration = song.duration or 0
+
+    thumb = await fetch_image(song.thumbnail)
+    if not thumb:
+        return ""
+
+    bg = add_controls(thumb)
+    image = make_sq(thumb)
+
+    paste_x, paste_y = 145, 155
+    bg.paste(image, (paste_x, paste_y), image)
+
+    draw = ImageDraw.Draw(bg)
+    draw.text((285, 180), "Apple Music", (192, 192, 192), font=FONTS["nfont"])
+    draw.text((285, 200), title, (255, 255, 255), font=FONTS["tfont"])
+    draw.text((287, 235), artist, (255, 255, 255), font=FONTS["cfont"])
+    draw.text((478, 321), get_duration(duration), (192, 192, 192), font=FONTS["dfont"])
+
+    await asyncio.to_thread(bg.save, save_dir)
+    return save_dir if await aiopath.exists(save_dir) else ""
