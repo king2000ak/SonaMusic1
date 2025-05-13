@@ -1,147 +1,148 @@
-import asyncio
-import os
-import re
-import random
-from io import BytesIO
-
-import aiofiles
-import aiohttp
-import httpx
-from PIL import (
-    Image, ImageDraw, ImageEnhance, ImageFilter,
-    ImageFont, ImageOps
-)
+import os, re, random, aiofiles, aiohttp, math
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from youtubesearchpython.__future__ import VideosSearch
+from EsproMusic import app
 from config import YOUTUBE_IMG_URL
 
+# Load fonts once (optimization)
+arial = ImageFont.truetype("EsproMusic/assets/font2.ttf", 30)
+font = ImageFont.truetype("EsproMusic/assets/font.ttf", 30)
+title_font = ImageFont.truetype("EsproMusic/assets/font3.ttf", 45)
 
-FONTS = {
-    "cfont": ImageFont.truetype("EsproMusic/assets/cfont.ttf", 15),
-    "dfont": ImageFont.truetype("EsproMusic/assets/font2.ttf", 12),
-    "nfont": ImageFont.truetype("EsproMusic/assets/font.ttf", 10),
-    "tfont": ImageFont.truetype("EsproMusic/assets/font.ttf", 20),
-}
+def changeImageSize(maxWidth, maxHeight, image):
+    widthRatio = maxWidth / image.size[0]
+    heightRatio = maxHeight / image.size[1]
+    newWidth = int(widthRatio * image.size[0])
+    newHeight = int(heightRatio * image.size[1])
+    return image.resize((newWidth, newHeight))
 
+def truncate(text):
+    words = text.split(" ")
+    text1, text2 = "", ""
+    for word in words:
+        if len(text1) + len(word) < 30:
+            text1 += " " + word
+        elif len(text2) + len(word) < 30:
+            text2 += " " + word
+    return [text1.strip(), text2.strip()]
 
-def resize_youtube_thumbnail(img: Image.Image) -> Image.Image:
-    target_size = 640
-    aspect_ratio = img.width / img.height
-    if aspect_ratio > 1:
-        new_width = int(target_size * aspect_ratio)
-        new_height = target_size
-    else:
-        new_width = target_size
-        new_height = int(target_size / aspect_ratio)
+def generate_light_dark_color():
+    return (random.randint(100, 200), random.randint(100, 200), random.randint(100, 200))
 
-    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-    left = (img.width - target_size) // 2
-    top = (img.height - target_size) // 2
-    return img.crop((left, top, left + target_size, top + target_size))
+def create_rgb_neon_circle(image, center, radius, border_width, steps=30):
+    draw = ImageDraw.Draw(image)
+    for step in range(steps):
+        red = int((math.sin(step / steps * math.pi * 2) * 127) + 128)
+        green = int((math.sin((step / steps * math.pi * 2) + (math.pi / 3)) * 127) + 128)
+        blue = int((math.sin((step / steps * math.pi * 2) + (math.pi * 2 / 3)) * 127) + 128)
+        draw.ellipse([
+            center[0] - radius - border_width + step,
+            center[1] - radius - border_width + step,
+            center[0] + radius + border_width - step,
+            center[1] + radius + border_width - step
+        ], outline=(red, green, blue), width=border_width)
+    return image
 
-
-def make_sq(image: Image.Image, size: int = 125) -> Image.Image:
-    side = min(image.size)
-    cropped = image.crop((
-        (image.width - side) // 2,
-        (image.height - side) // 2,
-        (image.width + side) // 2,
-        (image.height + side) // 2
+def crop_center_circle(img, output_size, border, crop_scale=1.5):
+    half_width, half_height = img.size[0] / 2, img.size[1] / 2
+    larger_size = int(output_size * crop_scale)
+    img = img.crop((
+        half_width - larger_size / 2,
+        half_height - larger_size / 2,
+        half_width + larger_size / 2,
+        half_height + larger_size / 2
     ))
-    resized = cropped.resize((size, size), Image.Resampling.LANCZOS)
-    mask = Image.new("L", (size, size), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, size, size), 30, fill=255)
-    rounded = ImageOps.fit(resized, (size, size))
-    rounded.putalpha(mask)
-    return rounded
+    img = img.resize((output_size - 2 * border, output_size - 2 * border))
+    final_img = Image.new("RGBA", (output_size, output_size), "white")
+    mask_main = Image.new("L", (output_size - 2 * border, output_size - 2 * border), 0)
+    draw_main = ImageDraw.Draw(mask_main)
+    draw_main.ellipse((0, 0, output_size - 2 * border, output_size - 2 * border), fill=255)
+    final_img.paste(img, (border, border), mask_main)
+    mask_border = Image.new("L", (output_size, output_size), 0)
+    draw_border = ImageDraw.Draw(mask_border)
+    draw_border.ellipse((0, 0, output_size, output_size), fill=255)
+    result = Image.composite(final_img, Image.new("RGBA", final_img.size, (0, 0, 0, 0)), mask_border)
+    center = (output_size // 2, output_size // 2)
+    radius = (output_size - 2 * border) // 2
+    return create_rgb_neon_circle(result, center, radius, 10)
 
+async def get_thumb(videoid):
+    # Check if thumbnail already exists in cache
+    if os.path.isfile(f"cache/{videoid}_v4.png"):
+        return f"cache/{videoid}_v4.png"
 
-def clean_text(text: str, limit: int = 17) -> str:
-    text = text.strip()
-    return f"{text[:limit - 3]}..." if len(text) > limit else text
-
-
-def add_controls(img: Image.Image) -> Image.Image:
-    img = img.filter(ImageFilter.GaussianBlur(25))
-    box = (120, 120, 520, 480)
-    region = img.crop(box)
-    dark_region = ImageEnhance.Brightness(region).enhance(0.5)
-
-    mask = Image.new("L", region.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, box[2] - box[0], box[3] - box[1]), 40, fill=255)
-    controls = Image.open("EsproMusic/assets/controls.png").convert("RGBA")
-
-    img.paste(dark_region, box, mask)
-    img.paste(controls, (135, 305), controls)
-    return img
-
-
-def get_duration(duration: int, time: str = "0:24") -> str:
+    # Fetch YouTube video details
+    url = f"https://www.youtube.com/watch?v={videoid}"
     try:
-        total = duration
-        current = sum(int(x) * 60**i for i, x in enumerate(reversed(time.split(":"))))
-        remaining = max(total - current, 0)
-        return f"{remaining // 60}:{remaining % 60:02}"
-    except:
-        return "0:00"
-
-
-async def fetch_image(url: str) -> Image.Image | None:
-    if not url:
-        return None
-    try:
-        async with httpx.AsyncClient() as client:
-            if "mzstatic.com" in url:
-                url = url.replace("500x500bb.jpg", "600x600bb.jpg")
-            response = await client.get(url, timeout=5)
-            response.raise_for_status()
-            img = Image.open(BytesIO(response.content)).convert("RGBA")
-            if "ytimg.com" in url:
-                img = resize_youtube_thumbnail(img)
-            return img
+        results = await VideosSearch(url, limit=1).next()
+        if not results or not results.get("result"):
+            return YOUTUBE_IMG_URL
+        result = results["result"][0]
     except Exception as e:
-        print(f"Image error: {e}")
-        return None
-
-
-async def gen_thumb(track_id: str, title: str, artist: str, thumbnail_url: str, duration: int) -> str:
-    save_path = f"cache/{track_id}.png"
-    if os.path.exists(save_path):
-        return save_path
-
-    title = clean_text(title)
-    artist = clean_text(artist or "Unknown")
-    thumb = await fetch_image(thumbnail_url)
-    if not thumb:
+        print(f"Error fetching YouTube results: {e}")
         return YOUTUBE_IMG_URL
 
-    bg = add_controls(thumb)
-    image = make_sq(thumb)
-    bg.paste(image, (145, 155), image)
+    # Extract video details
+    title = re.sub("\W+", " ", result.get("title", "Unsupported Title")).title()
+    duration = result.get("duration", "Unknown Mins")
+    thumbnail = result.get("thumbnails", [{}])[0].get("url", "").split("?")[0] or YOUTUBE_IMG_URL
+    views = result.get("viewCount", {}).get("short", "Unknown Views")
+    channel = result.get("channel", {}).get("name", "Unknown Channel")
 
-    draw = ImageDraw.Draw(bg)
-    draw.text((285, 180), "EsproMusic", (192, 192, 192), font=FONTS["nfont"])
-    draw.text((285, 200), title, (255, 255, 255), font=FONTS["tfont"])
-    draw.text((287, 235), artist, (255, 255, 255), font=FONTS["cfont"])
-    draw.text((478, 321), get_duration(duration), (192, 192, 192), font=FONTS["dfont"])
-
-    await asyncio.to_thread(bg.save, save_path)
-    return save_path if os.path.exists(save_path) else YOUTUBE_IMG_URL
-
-
-async def get_thumb(videoid: str) -> str:
-    if os.path.isfile(f"cache/{videoid}.png"):
-        return f"cache/{videoid}.png"
+    # Download thumbnail
+    async with aiohttp.ClientSession() as session:
+        async with session.get(thumbnail) as resp:
+            if resp.status == 200:
+                async with aiofiles.open(f"cache/thumb{videoid}.png", mode="wb") as f:
+                    await f.write(await resp.read())
 
     try:
-        results = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
-        result = (await results.next())["result"][0]
-        title = re.sub(r"\W+", " ", result.get("title", "Unknown Title")).title()
-        duration_str = result.get("duration", "0:00")
-        duration_sec = sum(int(x) * 60 ** i for i, x in enumerate(reversed(duration_str.split(":"))))
-        thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-        channel = result.get("channel", {}).get("name", "Unknown")
+        # Open downloaded thumbnail
+        youtube = Image.open(f"cache/thumb{videoid}.png")
 
-        return await gen_thumb(videoid, title, channel, thumbnail, duration_sec)
+        # Resize and process image
+        image1 = changeImageSize(1280, 720, youtube)
+        image2 = image1.convert("RGBA")
+        background = image2.filter(filter=ImageFilter.BoxBlur(20))
+        enhancer = ImageEnhance.Brightness(background)
+        background = enhancer.enhance(0.6)
+        draw = ImageDraw.Draw(background)
+
+        # Add circular thumbnail with neon effect
+        circle_thumbnail = crop_center_circle(youtube, 400, 20)
+        circle_thumbnail = circle_thumbnail.resize((400, 400))
+        background.paste(circle_thumbnail, (120, 160), circle_thumbnail)
+
+        # Add text and other details
+        title1 = truncate(title)
+        draw.text((565, 180), title1[0], fill=(255, 255, 255), font=title_font)
+        draw.text((565, 230), title1[1], fill=(255, 255, 255), font=title_font)
+        draw.text((565, 320), f"{channel}  |  {views[:23]}", (255, 255, 255), font=arial)
+        draw.text((10, 10), "TEAM THUNDER BOTS", fill="yellow", font=font)
+
+        # Add progress bar
+        line_length = 580
+        red_length = int(line_length * 0.6)
+        draw.line([(565, 380), (565 + red_length, 380)], fill="red", width=9)
+        draw.line([(565 + red_length, 380), (565 + line_length, 380)], fill="white", width=8)
+        draw.ellipse([565 + red_length - 10, 380 - 10, 565 + red_length + 10, 380 + 10], fill="red")
+        draw.text((565, 400), "00:00", (255, 255, 255), font=arial)
+        draw.text((1080, 400), duration, (255, 255, 255), font=arial)
+
+        # Add play icons
+        play_icons = Image.open("EsproMusic/assets/play_icons.png").resize((580, 62))
+        background.paste(play_icons, (565, 450), play_icons)
+
+        # Add stroke effect
+        stroke_width = 15
+        stroke_color = generate_light_dark_color()
+        stroke_image = Image.new("RGBA", (1280 + 2 * stroke_width, 720 + 2 * stroke_width), stroke_color)
+        stroke_image.paste(background, (stroke_width, stroke_width))
+
+        # Save and return the final thumbnail
+        os.remove(f"cache/thumb{videoid}.png")
+        stroke_image.save(f"cache/{videoid}_v4.png")
+        return f"cache/{videoid}_v4.png"
     except Exception as e:
-        print(f"Thumbnail error: {e}")
+        print(f"Error processing thumbnail: {e}")
         return YOUTUBE_IMG_URL
