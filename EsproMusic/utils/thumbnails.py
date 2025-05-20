@@ -118,7 +118,7 @@ async def get_thumb(videoid):
         draw.text((565, 180), title1[0], fill=(255, 255, 255), font=title_font)
         draw.text((565, 230), title1[1], fill=(255, 255, 255), font=title_font)
         draw.text((565, 320), f"{channel}  |  {views[:23]}", (255, 255, 255), font=arial)
-        draw.text((10, 10), "TEAM THUNDER BOTS", fill="yellow", font=font)
+        draw.text((10, 10), "ANANAD SHARMA", fill="yellow", font=font)
 
         # Add progress bar
         line_length = 580
