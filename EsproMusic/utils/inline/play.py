@@ -33,61 +33,61 @@ def stream_markup_timer(_, chat_id, played, dur):
     Bad = math.floor(percentage)
     # Progress bar (ba)
     if 0 < Bad <= 10:
-        ba = "⚪─────────"
+        ba = "𝄞─────────"
     elif 10 < Bad < 20:
-        ba = "━⚪────────"
+        ba = "━𝄞────────"
     elif 20 <= Bad < 30:
-        ba = "━━⚪───────"
+        ba = "━━𝄞───────"
     elif 30 <= Bad < 40:
-        ba = "━━━⚪──────"
+        ba = "━━━𝄞──────"
     elif 40 <= Bad < 50:
-        ba = "━━━━⚪─────"
+        ba = "━━━━𝄞─────"
     elif 50 <= Bad < 60:
-        ba = "━━━━━⚪────"
+        ba = "━━━━━𝄞────"
     elif 60 <= Bad < 70:
-        ba = "━━━━━━⚪───"
+        ba = "━━━━━━𝄞───"
     elif 70 <= Bad < 80:
-        ba = "━━━━━━━⚪──"
+        ba = "━━━━━━━𝄞──"
     elif 80 <= Bad < 95:
-        ba = "━━━━━━━━⚪─"
+        ba = "━━━━━━━━𝄞─"
     else:
-        ba = "━━━━━━━━━⚪"
+        ba = "━━━━━━━━━𝄞"
 
     # Text bar (bar)
     if 0 < Bad <= 5:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐁𝖾𝗌𝗍 𝐅𝖾α𝗍υ𝗋𝖾𝗌"
+        bar = "𝐁𝖾𝗌𝗍 𝐅𝖾α𝗍υ𝗋𝖾𝗌"
     elif 5 <= Bad < 10:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐅α𝗏ⱺ𝗋𝗂𝗍𝖾 ρᥣα𝗒ᥣ𝗂𝗌𝗍"
+        bar = "𝐅α𝗏ⱺ𝗋𝗂𝗍𝖾 ρᥣα𝗒ᥣ𝗂𝗌𝗍"
     elif 10 <= Bad < 15:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐌𝗂ᥣᥣ𝗂ⱺ𐓣 𝐒ⱺ𐓣𝗀𝗌"
+        bar = "𝐌𝗂ᥣᥣ𝗂ⱺ𐓣 𝐒ⱺ𐓣𝗀𝗌"
     elif 15 <= Bad < 20:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐄α𝗌𝗂ᥣ𝗒 𝐒𝗍𝗋𝖾αꭑ"
+        bar = "𝐄α𝗌𝗂ᥣ𝗒 𝐒𝗍𝗋𝖾αꭑ"
     elif 20 <= Bad < 25:
-        bar = "𝐋ⱺω-𝐒ρ𝖾𝖾ᑯ 𝐒𝗍𝗋𝖾αꭑ𝗂𐓣𝗀"
+        bar = "𝐒𝗍𝗋𝖾αꭑ𝗂𐓣𝗀"
     elif 25 <= Bad < 30:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐁𝗂𝗀 𝐃α𝗍αᑲα𝗌ɦ"
+        bar = "𝐁𝗂𝗀 𝐃α𝗍αᑲα𝗌ɦ"
     elif 30 <= Bad < 35:
-        bar = "𝐅𝗋𝖾𝖾 𝐃ⱺω𐓣ᥣⱺαᑯ 𝐌υ𝗌𝗂𝖼"
+        bar = "𝐃ⱺω𐓣ᥣⱺαᑯ 𝐌υ𝗌𝗂𝖼"
     elif 35 <= Bad < 40:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐅α𝗏ⱺ𝗋𝗂𝗍𝖾 ρᥣα𝗒ᥣ𝗂𝗌𝗍"
+        bar = "𝐅α𝗏ⱺ𝗋𝗂𝗍𝖾 ρᥣα𝗒ᥣ𝗂𝗌𝗍"
     elif 40 <= Bad < 45:
-        bar = "𝐋α𝗀 𝐅𝗋𝖾𝖾 𝐁α∂ 𝐌υʂιƈ"
+        bar = "𝐋α𝗀 𝐅𝗋𝖾𝖾"
     elif 45 <= Bad < 50:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐒𝗍υᑯ𝗂ⱺ"
+        bar = "𝐌υʂιƈ 𝐒𝗍υᑯ𝗂ⱺ"
     elif 50 <= Bad < 55:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐀ρρ"
+        bar = "𝐌υʂιƈ 𝐀ρρ"
     elif 55 <= Bad < 60:
-        bar = "𝐄𐓣𝗃ⱺ𝗒 𝐁α∂ 𝐌υʂιƈ 𝐎𐓣 𝐓𝖾ᥣ𝖾𝗀𝗋αꭑ"
+        bar = "𝐄𐓣𝗃ⱺ𝗒 𝐌υʂιƈ 𝐎𐓣 𝐓𝖾ᥣ𝖾𝗀𝗋αꭑ"
     elif 60 <= Bad < 65:
-        bar = "𝐄𐓣𝗃ⱺ𝗒 𝐁α∂ 𝐌υʂιƈ 𝐌υ𝗌𝗂𝖼"
+        bar = "𝐄𐓣𝗃ⱺ𝗒 𝐌υ𝗌𝗂𝖼"
     elif 65 <= Bad < 70:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝑴𝒖𝒔𝒊𝒄"
+        bar = "𝑴𝒖𝒔𝒊𝒄"
     elif 70 <= Bad < 75:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐁𝖾𝗌𝗍 𝐅𝖾α𝗍υ𝗋𝖾𝗌"
+        bar = "𝐁𝖾𝗌𝗍 𝐅𝖾α𝗍υ𝗋𝖾𝗌"
     elif 80 <= Bad < 80:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐌𝗂ᥣᥣ𝗂ⱺ𐓣 𝐒ⱺ𐓣𝗀𝗌"
+        bar = "𝐌𝗂ᥣᥣ𝗂ⱺ𐓣 𝐒ⱺ𐓣𝗀𝗌"
     elif 80 <= Bad < 85:
-        bar = "𝐁α∂ 𝐌υʂιƈ 𝐄α𝗌𝗂ᥣ𝗒 𝐒𝗍𝗋𝖾αꭑ"
+        bar = "𝐄α𝗌𝗂ᥣ𝗒 𝐒𝗍𝗋𝖾αꭑ"
     elif 85 <= Bad < 90:
         bar = "𝐋ⱺω-𝐒ρ𝖾𝖾ᑯ 𝐒𝗍𝗋𝖾αꭑ𝗂𐓣𝗀"
     elif 90 <= Bad < 95:
@@ -97,11 +97,12 @@ def stream_markup_timer(_, chat_id, played, dur):
 
     buttons = [
         [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
+            #InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
+            #InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
             InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
+            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),  
             InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+            #InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
             InlineKeyboardButton(
@@ -116,21 +117,24 @@ def stream_markup_timer(_, chat_id, played, dur):
             )
         ],
         [
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"), 
-        ],
+             InlineKeyboardButton(text="「 ✦ 𝐂𝐋𝐈𝐂𝐊 ✦ 」", url=f"https://t.me/Anand_Feelings"),
+          ],
     ]
     return buttons
 
 def stream_markup(_, chat_id):
     buttons = [
         [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
+            #InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
+            #InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
             InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
+            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),  
             InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+            #InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
-        [InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close")],
+        [
+             InlineKeyboardButton(text="「 ✦ 𝐂𝐋𝐈𝐂𝐊 ✦ 」", url=f"https://t.me/Anand_Feelings"),
+          ],
     ]
     return buttons
 
