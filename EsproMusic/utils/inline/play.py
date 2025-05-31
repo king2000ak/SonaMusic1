@@ -109,7 +109,6 @@ def stream_markup_timer(_, chat_id, played, dur):
          [
              InlineKeyboardButton(text="「 ✦ 𝐂𝐋𝐈𝐂𝐊 ✦ 」", url=f"https://t.me/Anand_Feelings"),
           ],
-    return buttons
         [
             InlineKeyboardButton(
                 text=f"{played} {ba} {dur}",
