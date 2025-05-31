@@ -1,7 +1,6 @@
 import math
 
 from pyrogram.types import InlineKeyboardButton
-from EsproMusic import app
 
 from EsproMusic.utils.formatters import time_to_seconds
 
@@ -33,27 +32,26 @@ def stream_markup_timer(_, chat_id, played, dur):
     percentage = (played_sec / duration_sec) * 100
     Bad = math.floor(percentage)
     # Progress bar (ba)
-
     if 0 < Bad <= 10:
-        bar = "─𝄞─────────"
+        ba = "⚪─────────"
     elif 10 < Bad < 20:
-        bar = "──𝄞────────"
+        ba = "━⚪────────"
     elif 20 <= Bad < 30:
-        bar = "───𝄞───────"
+        ba = "━━⚪───────"
     elif 30 <= Bad < 40:
-        bar = "────𝄞──────"
+        ba = "━━━⚪──────"
     elif 40 <= Bad < 50:
-        bar = "─────𝄞─────"
+        ba = "━━━━⚪─────"
     elif 50 <= Bad < 60:
-        bar = "──────𝄞────"
+        ba = "━━━━━⚪────"
     elif 60 <= Bad < 70:
-        bar = "───────𝄞───"
+        ba = "━━━━━━⚪───"
     elif 70 <= Bad < 80:
-        bar = "────────𝄞──"
+        ba = "━━━━━━━⚪──"
     elif 80 <= Bad < 95:
-        bar = "─────────𝄞─"
+        ba = "━━━━━━━━⚪─"
     else:
-        bar = "──────────𝄞"
+        ba = "━━━━━━━━━⚪"
 
     # Text bar (bar)
     if 0 < Bad <= 5:
@@ -99,16 +97,12 @@ def stream_markup_timer(_, chat_id, played, dur):
 
     buttons = [
         [
-            InlineKeyboardButton(text="❚❚", callback_data=f"ADMIN Pause|{chat_id}"),
-          #  InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-          InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
-         #   InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
-          #  InlineKeyboardButton(text="▣", callback_data=f"ADMIN Stop|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I ", callback_data=f"ADMIN Skip|{chat_id}"),
+            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
+            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
+            InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
+            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
+            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
-         [
-             InlineKeyboardButton(text="「 ✦ 𝐂𝐋𝐈𝐂𝐊 ✦ 」", url=f"https://t.me/Anand_Feelings"),
-          ],
         [
             InlineKeyboardButton(
                 text=f"{played} {ba} {dur}",
@@ -129,17 +123,14 @@ def stream_markup_timer(_, chat_id, played, dur):
 
 def stream_markup(_, chat_id):
     buttons = [
-        #[
-            #InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            #InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            #InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
-           # InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-           # InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
-         #],
-       
         [
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
-        ]
+            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
+            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
+            InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
+            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
+            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
+        ],
+        [InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close")],
     ]
     return buttons
 
